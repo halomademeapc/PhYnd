@@ -1,3 +1,5 @@
+import random
+
 class Board:
     def __init__(self, gameid):
         self.state = [8]
@@ -44,13 +46,29 @@ class Board:
         # record a user's move to db
         return
 
-    def getMlScales(self):
+    def getMlWeights(self):
         # get response weights from db
-        return
+        rows = db.execute('select position, weight from weights where scenario=? and weight > 0', self.stateToScenario()).fetchAll()
+        return rows
 
     def chooseResponse(self):
-        # choose a response based on weights
-        return
+        ### choose a response based on weights
+        # get weights
+        rows = self.getMlWeights()
+        # get sum of weights
+        totalWeight = 0.00
+        for row in rows:
+            totalWeight += row['weight']
+        # generate random number in sum range
+        target = totalWeight * random()
+        totalWeight = 0.00
+        # assign response
+        position = 0
+        for row in rows:
+            totalWeight += row['weight']
+            if(totalWeight > target):
+                move = row['position']
+        return position
 
     def isPlayable(self):
         # determine if game is in a state where a move can be made
