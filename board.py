@@ -7,6 +7,9 @@ class Board:
     
     # O for player, X for phynd
 
+    def getState(self):
+        return self.state
+
     def prepScenario(self):
         ### check if scenario is already in db
         row = db.execute('select count(*) from weights where scenario=?', self.stateToScenario()).fetchone()
@@ -42,8 +45,20 @@ class Board:
                 moves.append(i)
         return moves
 
-    def recordUserInput(self):
-        # record a user's move to db
+    def recordInput(self, entity, position):
+        self.state[position] = entity
+        if(entity.upper == 'O'):
+            human = True
+        else:
+            human = False
+        # get last move from game
+        lastMove = db.execute('select max(moveid)) from weights where gameid=?', self.gameid).fetchone()
+        if(lastMove):
+            move = lastMove[0] + 1
+        else:
+            move = 0
+        # record a move to db
+        db.execute('insert into moves values(?, ?, ?, ?)', move, self.gameid, human, position)
         return
 
     def getMlWeights(self):
@@ -71,7 +86,24 @@ class Board:
         return position
 
     def isPlayable(self):
-        # determine if game is in a state where a move can be made
+        ### determine if game is in a state where a move can be made
+        # check if board is full
+        flag = true
+        if(findPlayableSlots() == 0):
+            flag = false
+        else:
+            ## todo: add game logic
+            
+        return
+
+    def hasWon(self, entity):
+        ### check if an entity has won the game
+        # scan horizontally
+
+        # scan vertically
+
+        #check diagonals
+
         return
 
     def updateMlWeights(self):
