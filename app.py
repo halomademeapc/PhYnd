@@ -1,8 +1,10 @@
 from bottle import Bottle, run, Response, static_file, request, response, template, redirect
-import uuid
+import uuid, bottle, bottle.ext.sqlite, logging
 from board import Board
 
 app = Bottle()
+sqlPlugin = bottle.ext.sqlite.Plugin(dbfile='/ml.db')
+app.install(sqlPlugin)
 
 # Static file routes
 @app.route('/asset/<filepath:path>')

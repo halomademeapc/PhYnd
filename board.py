@@ -5,8 +5,9 @@ class Board:
     
     # O for player, X for phynd
 
-    def scenarioIsPresent(self):
+    def getScenarioId(self):
         # check if scenario is already in db
+        
         return
 
     def initScenario(self):
