@@ -1,5 +1,5 @@
-from bottle import Bottle, run, Response, static_file
-
+from bottle import Bottle, run, Response, static_file, request, response
+import uuid
 
 app = Bottle()
 
@@ -17,9 +17,10 @@ def index():
 def patterns():
     return Response("Learning status")
 
-@app.route('/play/<gameid>')
-def play_game(gameid):
-    return Response('Playing game with id of ' + gameid)
+@app.route('/play/<p_gameid>')
+def play_game(p_gameid):
+    gameid=uuid.UUID(p_gameid)
+    return Response('Playing game with id of ' + str(gameid))
 
 @app.route('/review/<gameid>')
 def review_game(gameid):
@@ -27,7 +28,13 @@ def review_game(gameid):
 
 @app.route('/play')
 def start_game():
-    return Response("Creating new game instance")
+    if request.get_cookie("gameid"):
+        gameid = uuid.UUID(request.get_cookie("gameid"))
+        return Response("Resume game with id " + str(gameid) + "?")
+    else:
+        gameid = uuid.uuid4()
+        response.set_cookie("gameid", str(gameid))
+        return Response("Creating new game instance")
 
 @app.error(404)
 def error404(error):
