@@ -1,0 +1,1 @@
+% include('board.tpl', interactive=True, gameid=gameid)

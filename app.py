@@ -1,25 +1,35 @@
 from bottle import Bottle, run, Response, static_file, request, response, template, redirect
 import uuid
+from board import Board
 
 app = Bottle()
 
 # Static file routes
-@app.route('asset/<filepath:path>')
+@app.route('/asset/<filepath:path>')
 def server_static(filepath):
     return static_file(filepath, root='/asset')
 
 # App routes
 @app.route('/')
 def index():
-    return Response("Welcome to PhYnd")
+    return template("home.tpl")
 
 @app.route('/stats')
 def patterns():
-    return Response("Learning status")
+    return template("stats.tpl")
 
 @app.route('/about')
 def about():
-    return Response("About phynd")
+    return template("about.tpl")
+
+@app.route('/ajax/board/<p_gameid>/<action>')
+def get_ajax_board(p_gameid, action):
+    gameid=uuid.UUID(p_gameid)
+    if(action=="play"):
+        interactive = True
+    else:
+        interactive = False
+    return template("ajaxboard.tpl", gameid=str(gameid), interactive = interactive)
 
 @app.route('/play/<p_gameid>')
 def play_game(p_gameid):
@@ -39,14 +49,18 @@ def review_game(gameid):
     return Response('Reviewing game with id of ' + gameid)
 
 @app.route('/play')
-def start_game():
+def play_game():
     if request.get_cookie("gameid"):
         gameid = uuid.UUID(request.get_cookie("gameid"))
-        return Response("Resume game with id " + str(gameid) + "?")
+        return redirect("/play/" + str(gameid))
     else:
-        gameid = uuid.uuid4()
-        response.set_cookie("gameid", str(gameid))
-        return Response("Creating new game instance")
+        return template("playlanding.tpl")
+
+@app.route('/play/new')
+def new_game():
+    gameid = uuid.uuid4()
+    response.set_cookie("gameid", str(gameid))
+    return redirect('/play/' + str(gameid))
 
 @app.route('/play/<p_gameid>/<p_movepos>')
 def record_move(p_gameid, p_movepos):
@@ -60,10 +74,3 @@ def error404(error):
 
 if __name__ == "__main__":
     run(app, host='localhost', port=9080, debug=True, reloader=True)
-
-class Board:
-
-    
-    # O for player, X for phynd
-    def mark(pos):
-        return "n/a"
