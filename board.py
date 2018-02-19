@@ -5,18 +5,39 @@ class Board:
     
     # O for player, X for phynd
 
-    def getScenarioId(self):
-        # check if scenario is already in db
-        
+    def prepScenario(self):
+        ### check if scenario is already in db
+        row = db.execute('select count(*) from weights where scenario=?', self.stateToScenario()).fetchone()
+        if(row[0] < 1):
+            self.initScenario()
         return
 
+    def stateToScenario(self):
+        # convert state to db format
+        scenario = ""
+        for i in (0,self.state.length):
+            if(self.state[i] == ""):
+                scenario += "-"
+            else:
+                scenario += self.state[i].upper()
+        return scenario
+
     def initScenario(self):
-        # initialize row for scenario
+        ### initialize db rows for scenario
+        # generate possible moves
+
+
+        # store to db
+
         return
 
     def findPlayableSlots(self):
-        # get an array of spots that are legal moves
-        return
+        # get a list of spots that are legal moves
+        moves = []
+        for i in range(0, self.state.length):
+            if(self.state[i] == ""):
+                moves.append(i)
+        return moves
 
     def recordUserInput(self):
         # record a user's move to db
