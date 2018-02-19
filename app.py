@@ -1,4 +1,4 @@
-from bottle import Bottle, run, Response, static_file, request, response
+from bottle import Bottle, run, Response, static_file, request, response, template
 import uuid
 
 app = Bottle()
@@ -20,7 +20,8 @@ def patterns():
 @app.route('/play/<p_gameid>')
 def play_game(p_gameid):
     gameid=uuid.UUID(p_gameid)
-    return Response('Playing game with id of ' + str(gameid))
+    #return Response('Playing game with id of ' + str(gameid))
+    return template('ingame.tpl', gameid=str(gameid))
 
 @app.route('/review/<gameid>')
 def review_game(gameid):
@@ -41,4 +42,4 @@ def error404(error):
     return Response("Something went wrong :/")
 
 if __name__ == "__main__":
-    run(app, host='localhost', port=9080, debug=False, reloader=True)
+    run(app, host='localhost', port=9080, debug=True, reloader=True)
