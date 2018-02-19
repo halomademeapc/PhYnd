@@ -31,7 +31,7 @@ def play_game(p_gameid):
     # record that move to the db
 
     # display result to user
-    
+
     return template('ingame.tpl', gameid=str(gameid))
 
 @app.route('/review/<gameid>')
@@ -60,3 +60,10 @@ def error404(error):
 
 if __name__ == "__main__":
     run(app, host='localhost', port=9080, debug=True, reloader=True)
+
+class Board:
+
+    
+    # O for player, X for phynd
+    def mark(pos):
+        return "n/a"
