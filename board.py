@@ -25,10 +25,11 @@ class Board:
     def initScenario(self):
         ### initialize db rows for scenario
         # generate possible moves
-
-
+        moves = self.findPlayableSlots()
+        default_weight = 5
         # store to db
-
+        for move in moves:
+            db.execute('insert into weights values (?, ?, ?)', self.stateToScenario(), move, default_weight)
         return
 
     def findPlayableSlots(self):
