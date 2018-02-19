@@ -2,6 +2,6 @@
 
 <p>test</p>
 
-% include('board.tpl', interactive=True)
+% include('board.tpl', interactive=True, gameid=gameid)
 
 % #include ('footer.tpl')

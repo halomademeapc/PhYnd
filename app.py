@@ -1,4 +1,4 @@
-from bottle import Bottle, run, Response, static_file, request, response, template
+from bottle import Bottle, run, Response, static_file, request, response, template, redirect
 import uuid
 
 app = Bottle()
@@ -13,14 +13,25 @@ def server_static(filepath):
 def index():
     return Response("Welcome to PhYnd")
 
-@app.route('/evo')
+@app.route('/stats')
 def patterns():
     return Response("Learning status")
+
+@app.route('/about')
+def about():
+    return Response("About phynd")
 
 @app.route('/play/<p_gameid>')
 def play_game(p_gameid):
     gameid=uuid.UUID(p_gameid)
-    #return Response('Playing game with id of ' + str(gameid))
+    # get move probabilities from db
+
+    # choose which move phynd will make
+
+    # record that move to the db
+
+    # display result to user
+    
     return template('ingame.tpl', gameid=str(gameid))
 
 @app.route('/review/<gameid>')
@@ -36,6 +47,12 @@ def start_game():
         gameid = uuid.uuid4()
         response.set_cookie("gameid", str(gameid))
         return Response("Creating new game instance")
+
+@app.route('/play/<p_gameid>/<p_movepos>')
+def record_move(p_gameid, p_movepos):
+    # add logic to record move here
+
+    return redirect('/play/' + p_gameid)
 
 @app.error(404)
 def error404(error):

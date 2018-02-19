@@ -1,8 +1,8 @@
-<h1>PhYnd</h1>
+<h1>PhȲnd</h1>
 <nav>
     <a href="/">Home</a>
     <a href="/play">Play</a>
-    <a href="/evo">Learning</a>
+    <a href="/stats">Stats</a>
     <a href="/about">About</a>
 </nav>
 % if title:
