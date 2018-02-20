@@ -48,9 +48,13 @@ def play_game(p_gameid, db):
         move = board.chooseResponse()
         logging.debug(str(board.gameid) + 'phynd has chosen ' + str(move) + "!")
         board.recordInput('X', move)
-
-        # display result to user
-        return template('ingame.tpl', gameid=str(board.getGameId()))
+        board.prepScenario()
+        # check if phynd won on that move
+        if board.isPlayable():
+            # display result to user
+            return template('ingame.tpl', gameid=str(board.getGameId()))
+        else:
+            return redirect('/review/' + p_gameid)
     else:
         # update weights and show results
 

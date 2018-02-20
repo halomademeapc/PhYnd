@@ -7,6 +7,7 @@ create table weights (
 
 create table games (
     gameid varchar(36) primary key,
+    completed boolean,
     outcome boolean
 );
 

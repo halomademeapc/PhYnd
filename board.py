@@ -50,7 +50,7 @@ class Board:
         ### initialize db rows for scenario
         # generate possible moves
         moves = self.findPlayableSlots()
-        default_weight = 5
+        default_weight = 4
         # store to db
         for move in moves:
             self.db.execute('insert into weights values (?, ?, ?)', (self.stateToScenario(), move, default_weight))
@@ -65,6 +65,11 @@ class Board:
         return moves
 
     def recordInput(self, entity, position):
+        # make sure game exists
+        count = self.db.execute('select count(*) from games where gameid=?', [str(self.gameid)]).fetchone()
+        if(count[0] == 0):
+            self.db.execute('insert into games (gameid, completed) values (?, 0)', [str(self.gameid)])
+
         if (position in self.findPlayableSlots()):
             self.state[position] = entity
             if(entity.upper() == 'O'):
@@ -115,8 +120,9 @@ class Board:
         if(len(self.findPlayableSlots()) == 0):
             flag = False
             logging.info(str(self.gameid) + 'game ended in draw')
+            self.endGame(None)
         else:
-            logging.info(str(self.gameid) + 'there are ' + str(len(self.findPlayableSlots())) + ' possible moves left')
+            logging.info(str(self.gameid) + ' there are ' + str(len(self.findPlayableSlots())) + ' possible moves left')
             if(self.hasWon('X') or self.hasWon('O')):
                 flag = False
         return flag
@@ -154,29 +160,53 @@ class Board:
                 
         if flag:
             logging.info(str(self.gameid) + ' game won by ' + entity)
+            self.endGame(entity)
         return flag
 
+    def endGame(self, entity=None):
+        # check if game has already been completed
+        game = self.db.execute('select outcome from games where gameid=?', [str(self.gameid)]).fetchone()
+        logging.debug(str(game))
+        if(game['outcome'] is None):
+            if (entity is None):
+                self.db.execute('update games set completed=1 where gameid=?', [str(self.gameid)])
+            else:
+                if entity == 'X':
+                    outcome = 1
+                else:
+                    outcome = 0
+                # mark game as completed
+                self.db.execute('update games set outcome=?, completed=1 where gameid=?', (outcome, str(self.gameid)))
+                # update weights
+                self.updateMlWeights(outcome)
+
     def updateMlWeights(self, won):
-        logging.debug(str(self.gameid) + "Board.udpateMlWeights called")
         ### update weights of moves at the end of a game based on winnings
         # get list of moves that were made
         # get from db
         moves = self.db.execute('select isHuman, position from moves where gameid=? order by moveid asc', [str(self.gameid)]).fetchall()
         # iterate through moves, find corresponsing scenario and update outcome weight
         workingstate = ["-","-","-","-","-","-","-","-","-"]
+        mvhistory = []
+        wshistory = []
+        wshistory.append(''.join(workingstate))
         for move in moves:
             # update working state
             if move['isHuman']:
                 indicator = "O"
             else:
                 indicator = "X"
-            workingstate[move['position']] = indicator
             # locate corresponding scenario and update outcome
-            if not move['isHuman']:
+            mvhistory.append(move['position'])
+            workingstate[move['position']] = indicator
+            wshistory.append(''.join(workingstate))
+        for i in range(0, len(mvhistory)):
+            if (i % 2 == 0):
                 if won:
-                    updatesql = "update table weights set weight = weight - 1 where scenario = ? and position = ?"
+                    updatesql = "update weights set weight = weight + 1 where scenario = ? and position = ?"
                 else:
-                    updatesql = "update table weights set weight = weight + 1 where scenario = ? and position = ?"
-                self.db.execute(updatesql,(''.join(workingstate), move['position']))
+                    updatesql = "update weights set weight = weight - 1 where scenario = ? and position = ?"
+                self.db.execute(updatesql,(wshistory[i], mvhistory[i]))
+                logging.debug(str(self.gameid) + ' updating weights for scenario ' + wshistory[i] + ', action ' + str(mvhistory[i]) + ' history ' + str(mvhistory) + ' ' + str(wshistory))
 
         return
