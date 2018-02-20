@@ -77,7 +77,7 @@ class Board:
     def recordInput(self, entity, position):
         logging.debug("Board.recordInput called")
         self.state[position] = entity
-        if(entity.upper == 'O'):
+        if(entity.upper() == 'O'):
             human = 1
         else:
             human = 0
@@ -88,9 +88,11 @@ class Board:
             move = lastMove[0] + 1
         else:
             move = 0
-        # record a move to db
-        logging.debug("adding " + str(move) + " " + str(self.gameid) + " " + str(human) + " " + str(position) + " to db.")
-        self.db.execute('insert into moves values (?, ?, ?, ?)', (move, str(self.gameid), bool(human), position))
+        # double-check that that tile is not already occupied
+        if (position in self.findPlayableSlots()):
+            # record a move to db
+            logging.debug("adding " + str(move) + " " + str(self.gameid) + " " + str(human) + " " + str(position) + " to db.")
+            self.db.execute('insert into moves values (?, ?, ?, ?)', (move, str(self.gameid), bool(human), position))
         return
 
     def getMlWeights(self):
@@ -128,19 +130,30 @@ class Board:
             flag = False
         else:
             ## todo: add game logic
-            flag = True
-        return
+            if(self.hasWon('X') or self.hasWon('O')):
+                flag = False
+        return flag
 
     def hasWon(self, entity):
         logging.debug("Board.hasWon called")
+        flag = False
         ### check if an entity has won the game
-        # scan horizontally
-
-        # scan vertically
-
+        
+        for i in range(0,3):
+            rsize = 3
+            # scan horizontally
+            xscan = 0 + (rsize * i)
+            if ((self.state[xscan] == entity and self.state[xscan + 1] == entity) and self.state[xscan + 2] == entity):
+                flag = True
+            # scan vertically
+            if ((self.state[i] == entity and self.state[i + rsize] == entity) and self.state[i + (2 * rsize)] == entity):
+                flag = True
         #check diagonals
-
-        return
+        if ((self.state[0] == entity and self.state[rsize + 1] == entity) and self.state[2 * (rsize + 1)] == entity):
+            flag = True
+        if ((self.state[rsize - 1] == entity and self.state[2 * (rsize - 1)] == entity) and self.state[3 * (rsize - 1)] == entity):
+            flag = True
+        return flag
 
     def updateMlWeights(self):
         logging.debug("Board.udpateMlWeights called")

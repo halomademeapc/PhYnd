@@ -1,7 +1,7 @@
 from bottle import Bottle, run, Response, static_file, request, response, template, redirect
 import uuid, bottle, logging
 from board import Board
-from build.lib.bottle_sqlite import *
+from build.lib.bottle_sqlite import Plugin
 
 app = Bottle()
 sqlPlugin = Plugin(dbfile='ml.db')
