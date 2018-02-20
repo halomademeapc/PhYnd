@@ -3,7 +3,6 @@ logging.basicConfig(filename='example.log',level=logging.DEBUG)
 
 class Board:
     def __init__(self, gameid, db):
-        logging.debug("Board.__init__ called")
         # set empty state
         self.state = ["-","-","-","-","-","-","-","-","-"]
         self.gameid = gameid
@@ -22,16 +21,13 @@ class Board:
         return self.gameid
 
     def prepScenario(self):
-        logging.debug("Board.prepScenario called")
         ### check if scenario is already in db
         row = self.db.execute('select count(*) from weights where scenario=?', [self.stateToScenario()]).fetchone()
-        logging.debug("board.prepscenario found " + str(row[0]))
         if(row[0] < 1):
             self.initScenario()
         return
 
     def setState(self):
-        logging.debug("board.setState called")
         # get from db
         moves = self.db.execute('select isHuman, position from moves where gameid=? order by moveid asc', [str(self.gameid)]).fetchall()
         #convert
@@ -41,7 +37,6 @@ class Board:
             else:
                 indicator = "X"
             self.state[move['position']] = indicator
-        logging.debug("new state after setState: " + str(self.state))
         return
 
     def stateToScenario(self):
@@ -52,7 +47,6 @@ class Board:
         return str(scenario)
 
     def initScenario(self):
-        logging.debug("Board.initScenario called")
         ### initialize db rows for scenario
         # generate possible moves
         moves = self.findPlayableSlots()
@@ -63,44 +57,38 @@ class Board:
         return
 
     def findPlayableSlots(self):
-        logging.debug("Board.findPlayableSlots called")
         # get a list of spots that are legal moves
         moves = []
         for counter, character in enumerate(self.state):
             if(character == "-"):
                 moves.append(counter)
-        logging.debug("Board.findPlayableSlots found " + str(moves))
         return moves
 
     def recordInput(self, entity, position):
-        logging.debug("Board.recordInput called")
-        self.state[position] = entity
-        if(entity.upper() == 'O'):
-            human = 1
-        else:
-            human = 0
-        # get last move from game
-        lastMove = self.db.execute('select max(moveid) from moves where gameid=?', [str(self.gameid)]).fetchone()
-        logging.debug("last move = " + str(lastMove[0]))
-        if(lastMove[0] is not None):
-            move = lastMove[0] + 1
-        else:
-            move = 0
-        # double-check that that tile is not already occupied
         if (position in self.findPlayableSlots()):
+            self.state[position] = entity
+            if(entity.upper() == 'O'):
+                human = 1
+            else:
+                human = 0
+            # get last move from game
+            lastMove = self.db.execute('select max(moveid) from moves where gameid=?', [str(self.gameid)]).fetchone()
+            if(lastMove[0] is not None):
+                move = lastMove[0] + 1
+            else:
+                move = 0
+            # double-check that that tile is not already occupied
+            logging.debug(str(self.gameid) + ' trying to add move ' + str(move) + ' by ' + str(entity) + ' in spot ' + str(position))
             # record a move to db
-            logging.debug("adding " + str(move) + " " + str(self.gameid) + " " + str(human) + " " + str(position) + " to db.")
             self.db.execute('insert into moves values (?, ?, ?, ?)', (move, str(self.gameid), bool(human), position))
         return
 
     def getMlWeights(self):
-        logging.debug("Board.getMlWeights called")
         # get response weights from db
-        rows = self.db.execute('select position, weight from weights where scenario=? and weight > 0', [self.stateToScenario()]).fetchAll()
+        rows = self.db.execute('select position, weight from weights where scenario=? and weight > 0', [self.stateToScenario()]).fetchall()
         return rows
 
     def chooseResponse(self):
-        logging.debug("Board.chooseResponse called")
         ### choose a response based on weights
         # get weights
         rows = self.getMlWeights()
@@ -117,10 +105,10 @@ class Board:
             position += row['weight']
             if(position > target):
                 move = row['position']
+                break
         return move
 
     def isPlayable(self):
-        logging.debug("Board.isPlayable called")
         ### determine if game is in a state where a move can be made
         # check if board is full
         flag = True
@@ -133,7 +121,6 @@ class Board:
         return flag
 
     def hasWon(self, entity):
-        logging.debug("Board.hasWon called")
         flag = False
         ### check if an entity has won the game
         rsize = 3
@@ -157,11 +144,12 @@ class Board:
         for counter in count:
             if counter == rsize:
                 flag = True
+                logging.info(str(self.gameid) + 'game won by ' + entity)
 
         return flag
 
     def updateMlWeights(self, won):
-        logging.debug("Board.udpateMlWeights called")
+        logging.debug(str(self.gameid) + "Board.udpateMlWeights called")
         ### update weights of moves at the end of a game based on winnings
         # get list of moves that were made
         # get from db
@@ -182,6 +170,5 @@ class Board:
                 else:
                     updatesql = "update table weights set weight = weight + 1 where scenario = ? and position = ?"
                 self.db.execute(updatesql,(''.join(workingstate), move['position']))
-                
 
         return

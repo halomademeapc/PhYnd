@@ -27,6 +27,8 @@ def about():
 
 @app.route('/ajax/board/<p_gameid>/<action>')
 def get_ajax_board(p_gameid, action, db):
+    logging.debug('get_ajax_board called')
+    # load board
     board = Board(uuid.UUID(p_gameid), db)
     if(action=="play"):
         interactive = True
@@ -36,18 +38,26 @@ def get_ajax_board(p_gameid, action, db):
 
 @app.route('/play/<p_gameid>')
 def play_game(p_gameid, db):
-    
-    # get move probabilities from db
+    logging.debug('play_game called')
     board = Board(uuid.UUID(p_gameid), db)
+    if board.isPlayable():
+            
+        # get move probabilities from db
+        board.prepScenario()
 
-    board.prepScenario()
-    # choose which move phynd will make
+        # choose which move phynd will make and record to db
+        logging.debug('letting phynd play')
+        move = board.chooseResponse()
+        logging.debug('phynd has chosen ' + str(move) + "!")
+        board.recordInput('X', move)
 
-    # record that move to the db
+        # display result to user
+        return template('ingame.tpl', gameid=str(board.getGameId()))
+    else:
+        # update weights and show results
 
-    # display result to user
+        return redirect('/review/' + p_gameid)
 
-    return template('ingame.tpl', gameid=str(board.getGameId()))
 
 @app.route('/review/<gameid>')
 def review_game(gameid, db):
@@ -69,8 +79,9 @@ def new_game(db):
 
 @app.route('/play/<p_gameid>/<p_movepos>')
 def record_move(p_gameid, p_movepos, db):
-    # add logic to record move here
+    # load board
     board = Board(uuid.UUID(p_gameid), db)
+    # record user input
     board.recordInput('O', int(p_movepos))
     return redirect('/play/' + p_gameid)
 
