@@ -78,17 +78,19 @@ class Board:
         logging.debug("Board.recordInput called")
         self.state[position] = entity
         if(entity.upper == 'O'):
-            human = True
+            human = 1
         else:
-            human = False
+            human = 0
         # get last move from game
-        lastMove = self.db.execute('select max(moveid)) from weights where gameid=?', self.gameid).fetchone()
-        if(lastMove):
+        lastMove = self.db.execute('select max(moveid) from moves where gameid=?', [str(self.gameid)]).fetchone()
+        logging.debug("last move = " + str(lastMove[0]))
+        if(lastMove[0] is not None):
             move = lastMove[0] + 1
         else:
             move = 0
         # record a move to db
-        self.db.execute('insert into moves values(?, ?, ?, ?)', (move, self.gameid, human, position))
+        logging.debug("adding " + str(move) + " " + str(self.gameid) + " " + str(human) + " " + str(position) + " to db.")
+        self.db.execute('insert into moves values (?, ?, ?, ?)', (move, str(self.gameid), bool(human), position))
         return
 
     def getMlWeights(self):

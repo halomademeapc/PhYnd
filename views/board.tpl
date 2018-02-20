@@ -4,13 +4,13 @@
     <tr>
     % for y in range(0,3):
         <td>
-        % if(interactive): 
+        % if(interactive & (state[pos] == '-')): 
             <a href="/play/{{gameid}}/{{pos}}">
         % end
             <div class="boarditem">
                 {{state[pos]}}
             </div>
-        % if(interactive): 
+        % if(interactive & (state[pos] == '-')): 
             </a>
         % end
         </td>

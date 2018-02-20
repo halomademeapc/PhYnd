@@ -14,7 +14,7 @@ create table moves (
     moveid int not null,
     gameid varchar(36) not null,
     isHuman boolean not null,
-    position tinyint not null,
+    position int not null,
     primary key (moveid, gameid),
     foreign key (gameid) references games(gameid)
 );

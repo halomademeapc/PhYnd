@@ -70,7 +70,8 @@ def new_game(db):
 @app.route('/play/<p_gameid>/<p_movepos>')
 def record_move(p_gameid, p_movepos, db):
     # add logic to record move here
-
+    board = Board(uuid.UUID(p_gameid), db)
+    board.recordInput('O', int(p_movepos))
     return redirect('/play/' + p_gameid)
 
 @app.error(404)
