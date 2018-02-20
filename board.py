@@ -2,85 +2,93 @@ import random, logging
 logging.basicConfig(filename='example.log',level=logging.DEBUG)
 
 class Board:
-    def __init__(self, gameid):
-        logging.info("Board.__init__ called")
+    def __init__(self, gameid, db):
+        logging.debug("Board.__init__ called")
         self.state = ["","","","","","","","",""]
         self.gameid = gameid
+        self.db = db
     
     # O for player, X for phynd
 
     def getState(self):
-        logging.info("Board.getState called")
+        logging.debug("Board.getState called")
         return self.state
 
-    def prepScenario(self, db):
-        logging.info("Board.prepScenario called")
+    def getGameId(self):
+        return self.gameid
+
+    def prepScenario(self):
+        logging.debug("Board.prepScenario called")
         ### check if scenario is already in db
-        row = db.execute('select count(*) from weights where scenario=?', self.stateToScenario()).fetchone()
+        row = self.db.execute('select count(*) from weights where scenario=?', [self.stateToScenario()]).fetchone()
+        logging.debug("board.prepscenario found " + str(row[0]))
         if(row[0] < 1):
-            self.initScenario(db)
+            self.initScenario()
         return
 
     def stateToScenario(self):
-        logging.info("Board.stateToScenario called, board size " + str(len(self.state)))
+        logging.debug("Board.stateToScenario called, board size " + str(len(self.state)) + " " + str(self.state))
         # convert state to db format
         scenario = ""
-        for i in (0,len(self.state) - 1):
-            if(self.state[i] == ""):
+        for character in self.state:
+            #logging.debug("board.statetoscenario is doing a pass")
+            if(character == ""):
                 scenario += "-"
+                #logging.debug("board.statetoscenario found a blank and is adding a dash " + scenario)
             else:
-                scenario += self.state[i].upper()
-        return scenario
+                scenario += character.upper()
+        logging.debug("Board.stateToScenario generated " + scenario)
+        return str(scenario)
 
-    def initScenario(self, db):
-        logging.info("Board.initScenario called")
+    def initScenario(self):
+        logging.debug("Board.initScenario called")
         ### initialize db rows for scenario
         # generate possible moves
         moves = self.findPlayableSlots()
         default_weight = 5
         # store to db
         for move in moves:
-            db.execute('insert into weights values (?, ?, ?)', (self.stateToScenario(), move, default_weight))
+            self.db.execute('insert into weights values (?, ?, ?)', (self.stateToScenario(), move, default_weight))
         return
 
     def findPlayableSlots(self):
-        logging.info("Board.findPlayableSlots called")
+        logging.debug("Board.findPlayableSlots called")
         # get a list of spots that are legal moves
         moves = []
         for i in range(0, len(self.state)):
             if(self.state[i] == ""):
                 moves.append(i)
-        logging.info("Board.findPlayableSlots found " + str(moves))
+        logging.debug("Board.findPlayableSlots found " + str(moves))
         return moves
 
-    def recordInput(self, entity, position, db):
-        logging.info("Board.recordInput called")
+    def recordInput(self, entity, position):
+        logging.debug("Board.recordInput called")
         self.state[position] = entity
         if(entity.upper == 'O'):
             human = True
         else:
             human = False
         # get last move from game
-        lastMove = db.execute('select max(moveid)) from weights where gameid=?', self.gameid).fetchone()
+        lastMove = self.db.execute('select max(moveid)) from weights where gameid=?', self.gameid).fetchone()
         if(lastMove):
             move = lastMove[0] + 1
         else:
             move = 0
         # record a move to db
-        db.execute('insert into moves values(?, ?, ?, ?)', (move, self.gameid, human, position))
+        self.db.execute('insert into moves values(?, ?, ?, ?)', (move, self.gameid, human, position))
         return
 
-    def getMlWeights(self, db):
-        logging.info("Board.getMlWeights called")
+    def getMlWeights(self):
+        logging.debug("Board.getMlWeights called")
         # get response weights from db
-        rows = db.execute('select position, weight from weights where scenario=? and weight > 0', self.stateToScenario()).fetchAll()
+        rows = self.db.execute('select position, weight from weights where scenario=? and weight > 0', self.stateToScenario()).fetchAll()
         return rows
 
-    def chooseResponse(self, db):
-        logging.info("Board.chooseResponse called")
+    def chooseResponse(self):
+        logging.debug("Board.chooseResponse called")
         ### choose a response based on weights
         # get weights
-        rows = self.getMlWeights(db)
+        rows = self.getMlWeights()
         # get sum of weights
         totalWeight = 0.00
         for row in rows:
@@ -97,7 +105,7 @@ class Board:
         return position
 
     def isPlayable(self):
-        logging.info("Board.isPlayable called")
+        logging.debug("Board.isPlayable called")
         ### determine if game is in a state where a move can be made
         # check if board is full
         flag = True
@@ -109,7 +117,7 @@ class Board:
         return
 
     def hasWon(self, entity):
-        logging.info("Board.hasWon called")
+        logging.debug("Board.hasWon called")
         ### check if an entity has won the game
         # scan horizontally
 
@@ -120,6 +128,6 @@ class Board:
         return
 
     def updateMlWeights(self):
-        logging.info("Board.udpateMlWeights called")
+        logging.debug("Board.udpateMlWeights called")
         # update weights of moves at the end of a game based on winnings
         return

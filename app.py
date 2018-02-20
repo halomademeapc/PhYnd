@@ -36,17 +36,18 @@ def get_ajax_board(p_gameid, action, db):
 
 @app.route('/play/<p_gameid>')
 def play_game(p_gameid, db):
-    gameid=uuid.UUID(p_gameid)
+    
     # get move probabilities from db
-    board = Board(gameid)
-    board.initScenario(db)
+    board = Board(uuid.UUID(p_gameid), db)
+
+    board.prepScenario()
     # choose which move phynd will make
 
     # record that move to the db
 
     # display result to user
 
-    return template('ingame.tpl', gameid=str(gameid))
+    return template('ingame.tpl', gameid=str(board.getGameId()))
 
 @app.route('/review/<gameid>')
 def review_game(gameid, db):
