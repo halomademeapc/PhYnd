@@ -30,10 +30,11 @@ def get_ajax_board(p_gameid, action, db):
     # load board
     board = Board(uuid.UUID(p_gameid), db)
     if(action=="play"):
-        interactive = True
+        interactive = 1
     else:
-        interactive = False
-    return template("ajaxboard.tpl", gameid=str(board.getGameId()), interactive = interactive, state=board.getState())
+        interactive = 0
+    logging.debug(str(interactive))
+    return template("ajaxboard.tpl", gameid=str(board.getGameId()), interact = interactive, state=board.getState())
 
 @app.route('/play/<p_gameid>')
 def play_game(p_gameid, db):
@@ -60,9 +61,16 @@ def play_game(p_gameid, db):
         return redirect('/review/' + p_gameid)
 
 
-@app.route('/review/<gameid>')
-def review_game(gameid, db):
-    return Response('Reviewing game with id of ' + gameid)
+@app.route('/review/<p_gameid>')
+def review_game(p_gameid, db):
+    board = Board(uuid.UUID(p_gameid), db)
+    winner = None
+    if (board.hasWon('X')):
+        winner = 'X'
+    else:
+        if (board.hasWon('O')):
+            winner = 'O'
+    return template('result.tpl', gameid=str(board.getGameId()), winner=winner)
 
 @app.route('/play')
 def play_landing(db):

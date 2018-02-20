@@ -1,7 +1,5 @@
 % include('header.tpl', title="Play", subtitle="You are playing game " + gameid + " against phȳnd")
 
-<p>test</p>
-
 <div class="ajaxBoard">
     phȳnd is thinking...
 </div>
