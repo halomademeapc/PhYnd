@@ -38,7 +38,6 @@ def get_ajax_board(p_gameid, action, db):
 
 @app.route('/play/<p_gameid>')
 def play_game(p_gameid, db):
-    logging.debug('play_game called')
     board = Board(uuid.UUID(p_gameid), db)
     if board.isPlayable():
             
@@ -46,9 +45,8 @@ def play_game(p_gameid, db):
         board.prepScenario()
 
         # choose which move phynd will make and record to db
-        logging.debug('letting phynd play')
         move = board.chooseResponse()
-        logging.debug('phynd has chosen ' + str(move) + "!")
+        logging.debug(str(board.gameid) + 'phynd has chosen ' + str(move) + "!")
         board.recordInput('X', move)
 
         # display result to user
@@ -66,8 +64,11 @@ def review_game(gameid, db):
 @app.route('/play')
 def play_landing(db):
     if request.get_cookie("gameid"):
-        gameid = uuid.UUID(request.get_cookie("gameid"))
-        return redirect("/play/" + str(gameid))
+        board = Board(uuid.UUID(request.get_cookie("gameid")), db)
+        if board.isPlayable():
+            return redirect("/play/" + str(board.getGameId()))
+        else:
+            return template("playlanding.tpl")
     else:
         return template("playlanding.tpl")
 

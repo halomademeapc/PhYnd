@@ -1,5 +1,5 @@
 import random, logging
-logging.basicConfig(filename='example.log',level=logging.DEBUG)
+logging.basicConfig(filename='phynd.log',level=logging.DEBUG)
 
 class Board:
     def __init__(self, gameid, db):
@@ -112,29 +112,36 @@ class Board:
         ### determine if game is in a state where a move can be made
         # check if board is full
         flag = True
-        if(self.findPlayableSlots() == 0):
+        if(len(self.findPlayableSlots()) == 0):
             flag = False
+            logging.info(str(self.gameid) + 'game ended in draw')
         else:
-            ## todo: add game logic
+            logging.info(str(self.gameid) + 'there are ' + str(len(self.findPlayableSlots())) + ' possible moves left')
             if(self.hasWon('X') or self.hasWon('O')):
                 flag = False
         return flag
 
     def hasWon(self, entity):
+        logging.info(str(self.gameid) + ' checking win conditions for ' + entity)
         flag = False
         ### check if an entity has won the game
         rsize = 3
+        count = [0,0,0,0]
         for i in range(0,rsize):
             # scan horizontally
-            xscan = 0 + (rsize * i)
-            count = [0,0,0,0]
+            count[0] = 0
             for j in range(0,rsize):
-                if self.state[xscan + j] == entity:
+                if self.state[(rsize * i) + j] == entity:
                     count[0] += 1
+            if (count[0] == rsize):
+                flag = True
             # scan vertically
+            count[1] = 0
             for k in range(0,rsize):
                 if self.state[i + (k * rsize)] == entity:
                     count[1] += 1
+            if (count[1] == rsize):
+                flag = True
             # check diagonals
             if self.state[i * (rsize + 1)] == entity:
                 count[2] += 1
@@ -144,8 +151,9 @@ class Board:
         for counter in count:
             if counter == rsize:
                 flag = True
-                logging.info(str(self.gameid) + 'game won by ' + entity)
-
+                
+        if flag:
+            logging.info(str(self.gameid) + ' game won by ' + entity)
         return flag
 
     def updateMlWeights(self, won):
