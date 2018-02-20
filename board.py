@@ -45,12 +45,10 @@ class Board:
         return
 
     def stateToScenario(self):
-        logging.debug("Board.stateToScenario called, board size " + str(len(self.state)) + " " + str(self.state))
         # convert state to db format
         scenario = ""
         for character in self.state:
             scenario += character.upper()
-        logging.debug("Board.stateToScenario generated " + scenario)
         return str(scenario)
 
     def initScenario(self):
@@ -98,7 +96,7 @@ class Board:
     def getMlWeights(self):
         logging.debug("Board.getMlWeights called")
         # get response weights from db
-        rows = self.db.execute('select position, weight from weights where scenario=? and weight > 0', self.stateToScenario()).fetchAll()
+        rows = self.db.execute('select position, weight from weights where scenario=? and weight > 0', [self.stateToScenario()]).fetchAll()
         return rows
 
     def chooseResponse(self):
@@ -116,10 +114,10 @@ class Board:
         # assign response
         position = 0
         for row in rows:
-            totalWeight += row['weight']
-            if(totalWeight > target):
+            position += row['weight']
+            if(position > target):
                 move = row['position']
-        return position
+        return move
 
     def isPlayable(self):
         logging.debug("Board.isPlayable called")
@@ -150,19 +148,40 @@ class Board:
             for k in range(0,rsize):
                 if self.state[i + (k * rsize)] == entity:
                     count[1] += 1
-            #check diagonals
+            # check diagonals
             if self.state[i * (rsize + 1)] == entity:
                 count[2] += 1
             if self.state[(i + 1) * (rsize - 1)] == entity:
                 count[3] += 1
-        #review findings
+        # review findings
         for counter in count:
             if counter == rsize:
                 flag = True
 
         return flag
 
-    def updateMlWeights(self):
+    def updateMlWeights(self, won):
         logging.debug("Board.udpateMlWeights called")
-        # update weights of moves at the end of a game based on winnings
+        ### update weights of moves at the end of a game based on winnings
+        # get list of moves that were made
+        # get from db
+        moves = self.db.execute('select isHuman, position from moves where gameid=? order by moveid asc', [str(self.gameid)]).fetchall()
+        # iterate through moves, find corresponsing scenario and update outcome weight
+        workingstate = ["-","-","-","-","-","-","-","-","-"]
+        for move in moves:
+            # update working state
+            if move['isHuman']:
+                indicator = "O"
+            else:
+                indicator = "X"
+            workingstate[move['position']] = indicator
+            # locate corresponding scenario and update outcome
+            if not move['isHuman']:
+                if won:
+                    updatesql = "update table weights set weight = weight - 1 where scenario = ? and position = ?"
+                else:
+                    updatesql = "update table weights set weight = weight + 1 where scenario = ? and position = ?"
+                self.db.execute(updatesql,(''.join(workingstate), move['position']))
+                
+
         return
