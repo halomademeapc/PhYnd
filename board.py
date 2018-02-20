@@ -4,14 +4,18 @@ logging.basicConfig(filename='example.log',level=logging.DEBUG)
 class Board:
     def __init__(self, gameid, db):
         logging.debug("Board.__init__ called")
-        self.state = ["","","","","","","","",""]
+        # set empty state
+        self.state = ["-","-","-","-","-","-","-","-","-"]
         self.gameid = gameid
         self.db = db
+
+        # populate with previous moves
+        self.setState()
+
     
     # O for player, X for phynd
 
     def getState(self):
-        logging.debug("Board.getState called")
         return self.state
 
     def getGameId(self):
@@ -26,17 +30,26 @@ class Board:
             self.initScenario()
         return
 
+    def setState(self):
+        logging.debug("board.setState called")
+        # get from db
+        moves = self.db.execute('select isHuman, position from moves where gameid=? order by moveid asc', [str(self.gameid)]).fetchall()
+        #convert
+        for move in moves:
+            if (move['isHuman']):
+                indicator = "O"
+            else:
+                indicator = "X"
+            self.state[move['position']] = indicator
+        logging.debug("new state after setState: " + str(self.state))
+        return
+
     def stateToScenario(self):
         logging.debug("Board.stateToScenario called, board size " + str(len(self.state)) + " " + str(self.state))
         # convert state to db format
         scenario = ""
         for character in self.state:
-            #logging.debug("board.statetoscenario is doing a pass")
-            if(character == ""):
-                scenario += "-"
-                #logging.debug("board.statetoscenario found a blank and is adding a dash " + scenario)
-            else:
-                scenario += character.upper()
+            scenario += character.upper()
         logging.debug("Board.stateToScenario generated " + scenario)
         return str(scenario)
 
@@ -55,9 +68,9 @@ class Board:
         logging.debug("Board.findPlayableSlots called")
         # get a list of spots that are legal moves
         moves = []
-        for i in range(0, len(self.state)):
-            if(self.state[i] == ""):
-                moves.append(i)
+        for counter, character in enumerate(self.state):
+            if(character == "-"):
+                moves.append(counter)
         logging.debug("Board.findPlayableSlots found " + str(moves))
         return moves
 

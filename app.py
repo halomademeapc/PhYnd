@@ -27,12 +27,12 @@ def about():
 
 @app.route('/ajax/board/<p_gameid>/<action>')
 def get_ajax_board(p_gameid, action, db):
-    gameid=uuid.UUID(p_gameid)
+    board = Board(uuid.UUID(p_gameid), db)
     if(action=="play"):
         interactive = True
     else:
         interactive = False
-    return template("ajaxboard.tpl", gameid=str(gameid), interactive = interactive)
+    return template("ajaxboard.tpl", gameid=str(board.getGameId()), interactive = interactive, state=board.getState())
 
 @app.route('/play/<p_gameid>')
 def play_game(p_gameid, db):
@@ -78,4 +78,4 @@ def error404(error):
     return Response("Something went wrong :/")
 
 if __name__ == "__main__":
-    run(app, host='localhost', port=9080, debug=True, reloader=True)
+    run(app, host='localhost', port=9081, debug=True, reloader=True)

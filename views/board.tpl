@@ -8,7 +8,7 @@
             <a href="/play/{{gameid}}/{{pos}}">
         % end
             <div class="boarditem">
-                {{x}}{{y}}
+                {{state[pos]}}
             </div>
         % if(interactive): 
             </a>
