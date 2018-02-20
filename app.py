@@ -1,9 +1,10 @@
 from bottle import Bottle, run, Response, static_file, request, response, template, redirect
-import uuid, bottle, bottle.ext.sqlite, logging
+import uuid, bottle, logging
 from board import Board
+from build.lib.bottle_sqlite import *
 
 app = Bottle()
-sqlPlugin = bottle.ext.sqlite.Plugin(dbfile='/ml.db')
+sqlPlugin = Plugin(dbfile='ml.db')
 app.install(sqlPlugin)
 
 # Static file routes
@@ -25,7 +26,7 @@ def about():
     return template("about.tpl")
 
 @app.route('/ajax/board/<p_gameid>/<action>')
-def get_ajax_board(p_gameid, action):
+def get_ajax_board(p_gameid, action, db):
     gameid=uuid.UUID(p_gameid)
     if(action=="play"):
         interactive = True
@@ -34,10 +35,11 @@ def get_ajax_board(p_gameid, action):
     return template("ajaxboard.tpl", gameid=str(gameid), interactive = interactive)
 
 @app.route('/play/<p_gameid>')
-def play_game(p_gameid):
+def play_game(p_gameid, db):
     gameid=uuid.UUID(p_gameid)
     # get move probabilities from db
-
+    board = Board(gameid)
+    board.initScenario(db)
     # choose which move phynd will make
 
     # record that move to the db
@@ -47,11 +49,11 @@ def play_game(p_gameid):
     return template('ingame.tpl', gameid=str(gameid))
 
 @app.route('/review/<gameid>')
-def review_game(gameid):
+def review_game(gameid, db):
     return Response('Reviewing game with id of ' + gameid)
 
 @app.route('/play')
-def play_game():
+def play_landing(db):
     if request.get_cookie("gameid"):
         gameid = uuid.UUID(request.get_cookie("gameid"))
         return redirect("/play/" + str(gameid))
@@ -59,13 +61,13 @@ def play_game():
         return template("playlanding.tpl")
 
 @app.route('/play/new')
-def new_game():
+def new_game(db):
     gameid = uuid.uuid4()
     response.set_cookie("gameid", str(gameid))
     return redirect('/play/' + str(gameid))
 
 @app.route('/play/<p_gameid>/<p_movepos>')
-def record_move(p_gameid, p_movepos):
+def record_move(p_gameid, p_movepos, db):
     # add logic to record move here
 
     return redirect('/play/' + p_gameid)
