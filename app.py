@@ -27,7 +27,6 @@ def about():
 
 @app.route('/ajax/board/<p_gameid>/<action>')
 def get_ajax_board(p_gameid, action, db):
-    logging.debug('get_ajax_board called')
     # load board
     board = Board(uuid.UUID(p_gameid), db)
     if(action=="play"):

@@ -166,7 +166,6 @@ class Board:
     def endGame(self, entity=None):
         # check if game has already been completed
         game = self.db.execute('select outcome from games where gameid=?', [str(self.gameid)]).fetchone()
-        logging.debug(str(game))
         if(game['outcome'] is None):
             if (entity is None):
                 self.db.execute('update games set completed=1 where gameid=?', [str(self.gameid)])
