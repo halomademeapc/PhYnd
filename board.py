@@ -138,21 +138,28 @@ class Board:
         logging.debug("Board.hasWon called")
         flag = False
         ### check if an entity has won the game
-        
-        for i in range(0,3):
-            rsize = 3
+        rsize = 3
+        for i in range(0,rsize):
             # scan horizontally
             xscan = 0 + (rsize * i)
-            if ((self.state[xscan] == entity and self.state[xscan + 1] == entity) and self.state[xscan + 2] == entity):
-                flag = True
+            count = [0,0,0,0]
+            for j in range(0,rsize):
+                if self.state[xscan + j] == entity:
+                    count[0] += 1
             # scan vertically
-            if ((self.state[i] == entity and self.state[i + rsize] == entity) and self.state[i + (2 * rsize)] == entity):
+            for k in range(0,rsize):
+                if self.state[i + (k * rsize)] == entity:
+                    count[1] += 1
+            #check diagonals
+            if self.state[i * (rsize + 1)] == entity:
+                count[2] += 1
+            if self.state[(i + 1) * (rsize - 1)] == entity:
+                count[3] += 1
+        #review findings
+        for counter in count:
+            if counter == rsize:
                 flag = True
-        #check diagonals
-        if ((self.state[0] == entity and self.state[rsize + 1] == entity) and self.state[2 * (rsize + 1)] == entity):
-            flag = True
-        if ((self.state[rsize - 1] == entity and self.state[2 * (rsize - 1)] == entity) and self.state[3 * (rsize - 1)] == entity):
-            flag = True
+
         return flag
 
     def updateMlWeights(self):
