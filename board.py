@@ -25,6 +25,9 @@ class Board:
         row = self.db.execute('select count(*) from weights where scenario=?', [self.stateToScenario()]).fetchone()
         if(row[0] < 1):
             self.initScenario()
+        row = self.db.execute('select max(weight) from weights where scenario = ?', [self.stateToScenario()]).fetchone()
+        if row[0] <= 0:
+            self.revitalizeScenario()
         return
 
     def setState(self):
@@ -55,6 +58,13 @@ class Board:
         for move in moves:
             self.db.execute('insert into weights values (?, ?, ?)', (self.stateToScenario(), move, default_weight))
         return
+
+    def revitalizeScenario(self):
+        ### bring back possibilities if phynd has lost too much in scenario
+        moves = self.findPlayableSlots()
+        row = self.db.execute('select min(weight) from weights where scenario = ?', [self.stateToScenario()]).fetchone()
+        boost = 1 - float(row[0])
+        self.db.execute('update weights set weight = weight + ? where scenario = ?', (boost, self.stateToScenario()))
 
     def findPlayableSlots(self):
         # get a list of spots that are legal moves
