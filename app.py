@@ -1,10 +1,10 @@
 from bottle import Bottle, run, Response, static_file, request, response, template, redirect
 import uuid, bottle, logging
 from board import Board
-from build.lib.bottle_sqlite import Plugin
+from bottle.ext import sqlite
 
 app = Bottle()
-sqlPlugin = Plugin(dbfile='ml.db')
+sqlPlugin = sqlite.Plugin(dbfile='ml.db')
 app.install(sqlPlugin)
 
 # Static file routes
