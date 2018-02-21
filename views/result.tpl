@@ -1,18 +1,18 @@
-% include('header.tpl', title="Summary", subtitle="Summary of game " + gameid + " against phȳnd")
+% include('header.tpl', title="Summary", subtitle="Summary of game " + gameid + " against phÿnd")
 
 
 % if winner is None:
     <h3>The game ended in a draw</h3>
 % end
 % if winner == 'X':
-    <h3>phȳnd wins!</h3>
+    <h3>phÿnd wins!</h3>
 % end
 % if winner == 'O':
     <h3>you won!</h3>
 % end
 
 <div class="ajaxBoard">
-    phȳnd is thinking...
+    phÿnd is thinking...
 </div>
 
 <button id="newGameButton">New Game</button>
