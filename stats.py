@@ -13,7 +13,7 @@ class Stat:
     def getAvgMoves(self):
         # only get moves of _completed_ games
         rowa = self.db.execute('select count(*) from moves inner join games on moves.gameid = games.gameid where completed = 1').fetchone()
-        return float(rowa[0]) / float(self.getTotalMoves())
+        return float(rowa[0]) / float(self.getTotalGames())
 
     def getScenarios(self):
         row = self.db.execute('select count(*) from (select count(*) from weights group by scenario)').fetchone()
