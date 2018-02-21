@@ -77,15 +77,23 @@ class Board:
             else:
                 human = 0
             # get last move from game
-            lastMove = self.db.execute('select max(moveid) from moves where gameid=?', [str(self.gameid)]).fetchone()
+            lastMove = self.db.execute('select max(moveid), isHuman from moves where gameid=?', [str(self.gameid)]).fetchone()
             if(lastMove[0] is not None):
                 move = lastMove[0] + 1
             else:
                 move = 0
+
+            allow = False
             # double-check that that tile is not already occupied
             logging.debug(str(self.gameid) + ' trying to add move ' + str(move) + ' by ' + str(entity) + ' in spot ' + str(position))
-            # record a move to db
-            self.db.execute('insert into moves values (?, ?, ?, ?)', (move, str(self.gameid), bool(human), position))
+            logging.debug(str(position in self.findPlayableSlots()) + ' ' + str(position) + " "  + str(self.findPlayableSlots()))
+            if lastMove['isHuman'] != human:
+                allow = True
+            if lastMove[0] is None:
+                allow = True
+            if allow == True:
+                # record a move to db
+                self.db.execute('insert into moves values (?, ?, ?, ?)', (move, str(self.gameid), bool(human), position))
         return
 
     def getMlWeights(self):
