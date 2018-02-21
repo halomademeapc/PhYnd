@@ -1,31 +1,31 @@
-from bottle import Bottle, run, Response, static_file, request, response, template, redirect
+from bottle import Bottle, run, Response, static_file, request, response, template, redirect, default_app 
 import uuid, bottle, logging
 from board import Board
 from bottle.ext import sqlite
 
-app = Bottle()
+application = Bottle()
 sqlPlugin = sqlite.Plugin(dbfile='ml.db')
-app.install(sqlPlugin)
+application.install(sqlPlugin)
 
 # Static file routes
-@app.route('/asset/<filepath:path>')
+@application.route('/asset/<filepath:path>')
 def server_static(filepath):
     return static_file(filepath, root='/asset')
 
-# App routes
-@app.route('/')
+# application routes
+@application.route('/')
 def index():
     return template("home.tpl")
 
-@app.route('/stats')
+@application.route('/stats')
 def patterns():
     return template("stats.tpl")
 
-@app.route('/about')
+@application.route('/about')
 def about():
     return template("about.tpl")
 
-@app.route('/ajax/board/<p_gameid>/<action>')
+@application.route('/ajax/board/<p_gameid>/<action>')
 def get_ajax_board(p_gameid, action, db):
     # load board
     board = Board(uuid.UUID(p_gameid), db)
@@ -36,7 +36,7 @@ def get_ajax_board(p_gameid, action, db):
     logging.debug(str(interactive))
     return template("ajaxboard.tpl", gameid=str(board.getGameId()), interact = interactive, state=board.getState())
 
-@app.route('/play/<p_gameid>')
+@application.route('/play/<p_gameid>')
 def play_game(p_gameid, db):
     board = Board(uuid.UUID(p_gameid), db)
     if board.isPlayable():
@@ -61,7 +61,7 @@ def play_game(p_gameid, db):
         return redirect('/review/' + p_gameid)
 
 
-@app.route('/review/<p_gameid>')
+@application.route('/review/<p_gameid>')
 def review_game(p_gameid, db):
     board = Board(uuid.UUID(p_gameid), db)
     winner = None
@@ -72,7 +72,7 @@ def review_game(p_gameid, db):
             winner = 'O'
     return template('result.tpl', gameid=str(board.getGameId()), winner=winner)
 
-@app.route('/play')
+@application.route('/play')
 def play_landing(db):
     if request.get_cookie("gameid"):
         board = Board(uuid.UUID(request.get_cookie("gameid")), db)
@@ -83,13 +83,13 @@ def play_landing(db):
     else:
         return template("playlanding.tpl")
 
-@app.route('/play/new')
+@application.route('/play/new')
 def new_game(db):
     gameid = uuid.uuid4()
     response.set_cookie("gameid", str(gameid))
     return redirect('/play/' + str(gameid))
 
-@app.route('/play/<p_gameid>/<p_movepos>')
+@application.route('/play/<p_gameid>/<p_movepos>')
 def record_move(p_gameid, p_movepos, db):
     # load board
     board = Board(uuid.UUID(p_gameid), db)
@@ -97,9 +97,11 @@ def record_move(p_gameid, p_movepos, db):
     board.recordInput('O', int(p_movepos))
     return redirect('/play/' + p_gameid)
 
-@app.error(404)
+@application.error(404)
 def error404(error):
     return Response("Something went wrong :/")
 
 if __name__ == "__main__":
-    run(app, host='localhost', port=9081, debug=True, reloader=True)
+    run(application, host='localhost', port=9081, debug=True, reloader=True)
+
+# application = default_app()
