@@ -111,6 +111,9 @@ class Board:
             if(position > target):
                 move = row['position']
                 break
+        if move is None:
+            moves = self.findPlayableSlots()
+            move = moves[random.randint(0, len(moves) - 1)]
         return move
 
     def isPlayable(self):
