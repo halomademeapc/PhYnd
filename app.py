@@ -1,6 +1,7 @@
 from bottle import Bottle, run, Response, static_file, request, response, template, redirect, default_app 
 import uuid, bottle, logging
 from board import Board
+from stats import Stat
 from bottle.ext import sqlite
 
 application = Bottle()
@@ -18,8 +19,9 @@ def index():
     return template("home.tpl")
 
 @application.route('/stats')
-def patterns():
-    return template("stats.tpl")
+def patterns(db):
+    stats = Stat(db)
+    return template("stats.tpl", totalGames=stats.getTotalGames(), totalMoves=stats.getTotalMoves(), avgMoves=stats.getAvgMoves(), scenarioCount=stats.getScenarios(), outcomeCount=stats.getModifiedOutcomes(), totalWins=stats.getWins(), totalLosses=stats.getLosses())
 
 @application.route('/about')
 def about():
