@@ -1,7 +1,7 @@
-% include('header.tpl', title="Play", subtitle="You are playing game " + gameid + " against phȳnd")
+% include('header.tpl', title="Play", subtitle="You are playing game " + gameid + " against phÿnd")
 
 <div class="ajaxBoard">
-    phȳnd is thinking...
+    phÿnd is thinking...
 </div>
 
 % #include ('footer.tpl')
