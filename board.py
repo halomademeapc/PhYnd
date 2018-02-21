@@ -26,7 +26,7 @@ class Board:
         if(row[0] < 1):
             self.initScenario()
         row = self.db.execute('select max(weight) from weights where scenario = ?', [self.stateToScenario()]).fetchone()
-        if row[0] <= 0:
+        if row[0] is None:
             self.revitalizeScenario()
         return
 
