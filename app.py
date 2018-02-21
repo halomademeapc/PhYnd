@@ -11,7 +11,7 @@ application.install(sqlPlugin)
 # Static file routes
 @application.route('/asset/<filepath:path>')
 def server_static(filepath):
-    return static_file(filepath, root='/asset')
+    return static_file(filepath, root='asset/')
 
 # application routes
 @application.route('/')
