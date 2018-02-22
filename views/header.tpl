@@ -35,7 +35,7 @@
 
             <!-- Links -->
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
+                <li class="nav-item">
                     <a class="nav-link" href="/">Home</a>
                 </li>
                 <li class="nav-item">
@@ -60,9 +60,4 @@
         </div>
         <!-- Collapsible content -->
 </nav>
-% if title:
-    <h2>{{title}}</h2>
-% end
-% if subtitle:
-    <p>{{subtitle}}</p>
-% end
+<div class="container mt-2">

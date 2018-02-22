@@ -19,3 +19,4 @@
     </tr>
 % end
 </table>
+<script src="/asset/js/board.js"></script>

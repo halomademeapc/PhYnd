@@ -25,9 +25,11 @@ class Board:
         row = self.db.execute('select count(*) from weights where scenario=?', [self.stateToScenario()]).fetchone()
         if(row[0] < 1):
             self.initScenario()
-        row = self.db.execute('select max(weight) from weights where scenario = ?', [self.stateToScenario()]).fetchone()
-        if row[0] <= 0:
-            self.revitalizeScenario()
+        if len(self.findPlayableSlots()) > 1:
+            row = self.db.execute('select max(weight) from weights where scenario = ?', [self.stateToScenario()]).fetchone()
+            if len(row) > 0:
+                if row[0] <= 0:
+                    self.revitalizeScenario()
         return
 
     def setState(self):
@@ -138,6 +140,7 @@ class Board:
         ### determine if game is in a state where a move can be made
         # check if board is full
         flag = True
+        logging.debug('checkng play ' + str(len(self.findPlayableSlots())) + ' ' + str(self.findPlayableSlots()) + ' ' + str(self.state))
         if(len(self.findPlayableSlots()) == 0):
             flag = False
             logging.info(str(self.gameid) + 'game ended in draw')
@@ -146,6 +149,7 @@ class Board:
             logging.info(str(self.gameid) + ' there are ' + str(len(self.findPlayableSlots())) + ' possible moves left')
             if(self.hasWon('X') or self.hasWon('O')):
                 flag = False
+        logging.debug(str(flag))
         return flag
 
     def hasWon(self, entity):
