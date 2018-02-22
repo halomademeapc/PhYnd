@@ -18,17 +18,43 @@
     src="http://code.jquery.com/jquery-3.3.1.min.js"
     integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
     crossorigin="anonymous"></script>
-    <h1>phÿnd</h1>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
 </head>
-<nav>
-    <a href="/">Home</a>
-    <a href="/play">Play</a>
-    <a href="/stats">Stats</a>
-    <a href="/about">About</a>
+<nav class="navbar navbar-expand-lg navbar-dark primary-color">
+    <a class="navbar-brand" href="/">phÿnd</a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavCollapse" aria-controls="mainNavCollapse"
+        aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <script>
+    $(".navbar-toggler").click(function() {
+        $("#mainNavCollapse").slideToggle()
+    });
+    </script>
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="mainNavCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/play">Play</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/stats">Stats</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">About</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav ml-auto nav-flex-icons">
+                <li class="nav-item">
+                    <a href="https://github.com/halomademeapc/PhYnd" class="nav-link waves-effect waves-light">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
 </nav>
-% if title:
-    <h2>{{title}}</h2>
-% end
-% if subtitle:
-    <p>{{subtitle}}</p>
-% end
+<div class="container mt-3">
