@@ -1,5 +1,8 @@
 % include('header.tpl', title="Stats", subtitle="Here are some numbers about how much time has been wasted thus far.")
-
+<nav class="breadcrumb">
+    <a class="breadcrumb-item" href="/">phÿnd</a>
+    <span class="breadcrumb-item active">stats</span>
+</nav>
 <div class="card-deck">
     <div class="card mb-4">
         <div class="card-body">
