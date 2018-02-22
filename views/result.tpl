@@ -33,7 +33,7 @@
                     % end
                 </h4>
                 <p class="card-text">Thanks for playing! Your contribution probably won't help mankind's advancement, but hopefully it was at least a little fun.</p>
-                <a class="btn btn-unique waves-effect waves-light" href="/play/new">Play again</a>
+                <a class="btn btn-primary waves-effect waves-light" href="/play/new">Play again</a>
             </div>
         </div>
     </div>

@@ -10,7 +10,7 @@
                 <div class="statcontent align-middle">
                     <div class="text-white number">{{str(totalGames)}}</div>
                     <div class="text-light statico">
-                        <i class="fas fa-check"></i>
+                        <i class="fas fa-flag-checkered"></i>
                     </div>
                 </div>
             </div>
@@ -51,13 +51,13 @@
         <div class="card-body">
             <div class="statcircle bg-info">
                 <div class="statcontent align-middle">
-                    <div class="text-white number">{{str(avgMoves)}}</div>
+                    <div class="text-white number">{{"{0:.2f}".format(avgMoves)}}</div>
                     <div class="text-light statico">
                         <i class="far fa-chart-bar"></i>
                     </div>
                 </div>
             </div>
-            <p class="card-text text-center">The average game lasts for {{str(avgMoves)}} moves.</p>
+            <p class="card-text text-center">The average game lasts for {{"{0:.2f}".format(avgMoves)}} moves.</p>
         </div>
     </div>
 
