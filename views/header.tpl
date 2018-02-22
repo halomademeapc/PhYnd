@@ -21,19 +21,19 @@
     <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
 </head>
 <nav class="navbar navbar-expand-lg navbar-dark primary-color">
-    <!-- Navbar brand -->
     <a class="navbar-brand" href="/">phÿnd</a>
 
-    <!-- Collapse button -->
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav" aria-controls="basicExampleNav"
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavCollapse" aria-controls="mainNavCollapse"
         aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-
+    <script>
+    $(".navbar-toggler").click(function() {
+        $("#mainNavCollapse").slideToggle()
+    });
+    </script>
     <!-- Collapsible content -->
-    <div class="collapse navbar-collapse" id="basicExampleNav">
-
-            <!-- Links -->
+    <div class="collapse navbar-collapse" id="mainNavCollapse">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="/">Home</a>
@@ -47,9 +47,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/about">About</a>
                 </li>
-    
             </ul>
-            <!-- Links -->
             <ul class="navbar-nav ml-auto nav-flex-icons">
                 <li class="nav-item">
                     <a href="https://github.com/halomademeapc/PhYnd" class="nav-link waves-effect waves-light">
@@ -58,6 +56,5 @@
                 </li>
             </ul>
         </div>
-        <!-- Collapsible content -->
 </nav>
 <div class="container mt-3">

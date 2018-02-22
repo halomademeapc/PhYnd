@@ -7,7 +7,7 @@
     <p>
         Play a few rounds and help our robot overlords become smarter.
     </p>
-    <a class="btn btn-outline-primary waves-effect" href="/about">See how it works</a>
+    <a class="btn btn-outline-primary waves-effect btn-lg" href="/about">See how it works</a>
     <a class="btn btn-primary btn-lg waves-effect" role="button" href="/play">Play now</a>
 </div>
 
