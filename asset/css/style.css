@@ -12,6 +12,14 @@
     transition: background-color .15s, box-shadow .15s;
 }
 
+.board {
+    margin :auto;
+}
+
+.ajaxboard {
+    text-align: center;
+}
+
 .naughts {
     background-color: #1A237E;
 }
@@ -33,4 +41,34 @@
 .unclaimed:hover {
     background-color: #AAA;
     box-shadow: .05em .05em .6em grey;
+}
+
+.darken {
+    background-color: rgba(0,0,0,0.04)
+}
+
+.statcircle {
+    font-size: 3em;
+    width: 3em;
+    height: 3em;
+    border-radius: 3em;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    margin-bottom: .5em;
+}
+
+.statcontent {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.statico {
+    font-size: .3em;
+    display: block;
+    margin-top: -.5em;
 }
