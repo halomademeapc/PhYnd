@@ -14,7 +14,10 @@
 
 % #include ('footer.tpl')
 <script>
+    $.ajaxSetup ({
+        cache: false
+    });
     $(document).ready(function () {
-        $(".ajaxBoard").load("/ajax/board/{{gameid}}/play")
+        $(".ajaxBoard").load("/ajax/board/{{gameid}}/play");
     })
 </script>

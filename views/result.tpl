@@ -42,6 +42,9 @@
 % #include ('footer.tpl')
 <script>
     $(document).ready(function () {
-        $(".ajaxBoard").load("/ajax/board/{{gameid}}/view")
+        $.ajaxSetup ({
+            cache: false
+        });
+        $(".ajaxBoard").load("/ajax/board/{{gameid}}/view");
     });
 </script>
